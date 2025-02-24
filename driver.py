@@ -78,9 +78,10 @@ def main():
     
     error = 0.0
     
+    # Kp = 0.08
     Kp = 0.1
     Ki = 0.01
-    Kd = 1.1
+    Kd = 0.5
 
     try:
         while True:
@@ -92,7 +93,7 @@ def main():
             
             #integral += error
             #derivative = error - previous_error
-            correction = Kp * error #+ Ki * integral + Kd * derivative
+            correction = Kp * error #+ Kd * derivative#+ Ki * integral + Kd * derivative
 
             #update previous error 
             print(f'error is {error}, correction is {correction}')
@@ -100,27 +101,22 @@ def main():
             
             power = clamp(base_speed + correction, base_speed, 1.0) if correction > 0 else clamp(-base_speed-correction, -1.0, -base_speed)
 
-            #move left 
-            #if (current_lux < lower_target):
-            #left_motor.velocity_command = base_speed - correction
-            #right_motor.velocity_command = -base_speed - correction
-            #move right
-            #elif (current_lux > upper_target):
-            if abs(error) > 2:
+
+            if abs(error) > 3.5: #4.5
                 if correction > 0:
-                    right_motor.power_command = clamp(-base_speed - correction, -1.0, -base_speed)
-                    left_motor.power_command = clamp(base_speed + correction, base_speed, 1.0)
-                elif correction < 0:
                     right_motor.power_command = clamp(base_speed + correction, base_speed, 1.0)
                     left_motor.power_command = clamp(-base_speed - correction, -1.0, -base_speed)
+                    print(" move left")
+                elif correction < 0:
+                    right_motor.power_command = clamp(-base_speed - correction, -1.0, -base_speed)
+                    left_motor.power_command = clamp(base_speed + correction, base_speed, 1.0)
+                    print("move right")
             else:
-                left_motor.power_command = base_speed
-                right_motor.power_command = base_speed
-            #else:
-            #left_motor.velocity_command = base_speed
-            #right_motor.velocity_command = -base_speed       
+                left_motor.power_command = -base_speed
+                right_motor.power_command = -base_speed
+    
             
-            time.sleep(0.02)
+            time.sleep(0.05)
             
             
             # if  (lux>=30 and lux <= 45):  # Darker surface → Move right
